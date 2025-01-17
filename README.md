@@ -15,14 +15,14 @@
 # Tasks + Steps:
 ## Mission 1: Launch EC2 Instance with EBS Volume and UserData
 ### Step 1: Launch EC2 Instance with EBS Volume
-* Launch an EC2 instance using AWS CLI.
-* Specify the necessary details, including AMI ID, instance type, key pair, subnet, security group, and tags.
-* Create an EBS volume in the same availability zone and attach it to the launched EC2 instance.
+* Launch an **EC2 instance** using **AWS CLI**.
+* Specify the necessary details: **AMI ID, instance type, key pair, subnet, security group, and tags**.
+* Create an **EBS volume** in the same **availability zone** and attach it to the launched **EC2 instance**.
 ### Step 2: Mount EBS Volume Using UserData
-* Create a UserData script ( userdata.sh ) to be executed during instance launch.
-* The script should format the EBS volume, create a mount point, and mount the volume.
-* Ensure the UserData script is made executable ( chmod +x userdata.sh ).
-* Launch the EC2 instance, including the UserData script for automatic EBS volume setup.
+* Create a **UserData script ( userdata.sh )** to be executed during instance launch.
+* The script should format the **EBS volume**, create a mount point, and mount the volume.
+* Ensure the **UserData script** is made executable: ```chmod +x userdata.sh```
+* Launch the **EC2 instance**, including the **UserData script** for automatic **EBS volume** setup.
 
 ## Mission 2: Create and Mount EFS Volume
 ### Step 1: Create an EFS Volume
