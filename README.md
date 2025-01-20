@@ -72,9 +72,14 @@
       --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=<instance-name>}]'
     ```
 * Create an **EBS volume** in the same **availability zone** and attach it to the launched **EC2 instance**.
-  ```
-  ???????????????????????????
-  ```
+  - Create:
+    ```
+    $ aws ec2 create-volume --volume-type <type of storage volume> --availability-zone <availability-zone> --size <size-in-GiB>
+    ```
+  - Attach:
+    ```
+    $ aws ec2 attach-volume --volume-id <id of created volume> --instance-id <instance-id where volume is to be attached> --device <device-name>
+    ```
 ### Step 2: Mount EBS Volume Using UserData
 * Create a **UserData script ( userdata.sh )** to be executed during instance launch.
 * The script should format the **EBS volume**, create a mount point, and mount the volume.
