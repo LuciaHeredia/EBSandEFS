@@ -142,19 +142,44 @@
   ```
   $ lsblk
   ```
-* Exit root:
-  ```
-  $ exit
-  ```
+* Exit and Check changes:
+  - Exit root:
+    ```
+    $ exit
+    ```
+  - Exit EC2 instance:
+    ```
+    $ exit
+    ```
+  - Reboot EC2 instance:
+    ```
+    $ aws ec2 reboot-instances --instance-ids <instance-id>
+    ```
+  - Enter EC2 instance again with SSH Client as before.
+  - Enter as root as before.
+  - Check mount again:
+    ```
+    $ lsblk
+    ```
 
 ## Mission 2: Create and Mount EFS Volume
 ### Step 1: Create an EFS Volume
-* Navigate to the AWS Management Console and access the EFS service.
-* Create a new EFS file system, specifying VPC, name, performance mode, and throughput mode.
-* Configure network access, including selecting VPC and defining security groups.
-* Review and create the file system.
+* Navigate to the **AWS Management Console** and access the **EFS service**.
+* Create a new **EFS file system**, select "customize" and configure: name, throughput mode, performance mode, network access, including selecting VPC and defining security groups:
+  - Set **EFS** "name".
+  - Select "Throughput mode".
+  - In "Additional settings" -> set "Performance mode".
+  - In "Network access" select VPC ID and security groups.
 ### Step 2: Mount EFS Volume on EC2 Instance
-* Install the EFS mount helper on the EC2 instance using the package manager.
-* Create a mount point on the EC2 instance for the EFS volume.
+* Install the EFS mount helper on the EC2 instance using the package manager:
+  - Enter EC2 instance again with SSH Client as before.
+  - Install the EFS mount helper(NFS Client):
+    ```
+    $ 
+    ```
+* Create a mount point on the EC2 instance for the EFS volume:
+  ```
+  $ mkdir efs 
+  ```
 * Mount the EFS volume to the specified mount point.
 * Access the DNS name of the EFS file system from the console for mounting on EC2 instances.
