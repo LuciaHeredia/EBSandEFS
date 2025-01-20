@@ -13,8 +13,8 @@
 <br/>
 
 # Tasks + Steps:
-## Mission 1: Launch EC2 Instance with EBS Volume and UserData
-### Step 1: Launch EC2 Instance with EBS Volume
+## Mission 1: Launch EC2 Instance and Mount EBS Volume with UserData
+### Step 1: Launch EC2 Instance
 * Download **AWS CLI** and verify if it’s properly installed with the command:
   ```
   $ aws --version
@@ -45,11 +45,11 @@
   ```
 * Launch an **EC2 instance** using **AWS CLI** (specify the necessary details: **AMI ID, instance type, key pair, subnet, security group, and tags**):
   - Get **AMI ID**:
-    - Go to "ec2 Dashboard".
+    - Go to "EC2 Dashboard".
     - Then in the left menu click on "Images", and then "AMI Catalog".
     - Here you'll find a list of base images from AWS along with the **AMI ID**.
   - Get **VPC ID** and **Subnet Id**:
-    - Go to the "VPC dashboard" and click on "VPCs", here you will get the "VPC ID".
+    - Go to the "VPC Dashboard" and click on "VPCs", here you will get the "VPC ID".
     - Then in the left menu click on "Virtual private cloud", then "Subnets", and search with the "VPC ID" to list all the subnets associated with that **VPC** and copy the "Subnet ID".
   - Setting up **SSH key pair**, in order to authenticate our EC2 instance:
     ```
@@ -59,7 +59,15 @@
     ```
   - Setting up a **security group**, in order to control who has access to that instance:
     ```
-    $ aws ec2 create-security-group --group-name <group name> --description "rules for this group" --vpc-id <vpc-xxxx>
+    $ aws ec2 create-security-group \
+      --group-name <group name> \
+      --description "rules for this group" \
+      --vpc-id <vpc-xxxx>
+    $ aws ec2 authorize-security-group-ingress \
+      --group-id <group-id> \
+      --protocol tcp \
+      --port 22 \
+      --cidr 0.0.0.0/0
     ```
   - Finally, Launching the instance:
     ```
@@ -71,23 +79,73 @@
       --security-group-ids <security-group-id> \
       --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=<instance-name>}]'
     ```
+### Step 2: Create and Attach an EBS Volume
 * Create an **EBS volume** in the same **availability zone** and attach it to the launched **EC2 instance**.
   - Create:
     ```
     $ aws ec2 create-volume --volume-type <type of storage volume> --availability-zone <availability-zone> --size <size-in-GiB>
     ```
-  - Attach:
+  - Attach: ( *device-name* usually: /dev/sd* or /dev/xvd* )
     ```
     $ aws ec2 attach-volume --volume-id <id of created volume> --instance-id <instance-id where volume is to be attached> --device <device-name>
     ```
-### Step 2: Mount EBS Volume Using UserData
-* Create a **UserData script ( userdata.sh )** to be executed during instance launch.
-* The script should format the **EBS volume**, create a mount point, and mount the volume.
+### Step 3: Mount EBS Volume Using UserData
+* Connect to created EC2 instance with SSH Client:
+  - Go to "EC2 Dashboard".
+  - Press your "EC2 Instance", press "connect", and follow the instructions for "SSH client".
+* Enter as root:
+  ```
+  $ sudo -i
+  ```
+* Create a **UserData script ( userdata.sh )** to be executed during instance launch:
+  ```
+  $ vim userdata.sh
+  ```
+* The script should format the **EBS volume**, create a mount point, and mount the volume. Also, mount EBS volume automatically on boot:
+  ```
+  #!/bin/bash
+
+  # Set the device name and mount point for the EBS volume
+  EBS_DEVICE=/dev/xvd*
+  MOUNT_POINT=/mnt/<ebs-volume-folder-name>
+  
+  # Check if the EBS volume is already attached
+  if [ -b "$EBS_DEVICE" ]; then
+    # Create a file system on the EBS volume if it's empty
+    if ! blkid "$EBS_DEVICE" | grep -q "Filesystem"; then
+      mkfs -t ext4 "$EBS_DEVICE"
+    fi
+  
+    # Mount the EBS volume
+    mount "$EBS_DEVICE" "$MOUNT_POINT"
+    echo "Mounted $EBS_DEVICE to $MOUNT_POINT"
+  else
+    echo "EBS volume not attached or not found"
+    exit 1
+  fi
+  
+  # Add an entry to /etc/fstab to mount the EBS volume automatically on boot
+  echo "UUID=$(blkid -o value -s UUID "$EBS_DEVICE") $MOUNT_POINT ext4 defaults,nofail 0 2" >> /etc/fstab
+  
+  # Update the system's fstab file
+  sudo mount -a
+  ```
 * Ensure the **UserData script** is made executable:
   ```
-  chmod +x userdata.sh
+  $ chmod +x userdata.sh
   ```
-* Launch the **EC2 instance**, including the **UserData script** for automatic **EBS volume** setup.
+* Run the script:
+  ```
+  $ ./userdata.sh
+  ```
+* Check EBS volume(xvd*) has a set mount point:
+  ```
+  $ lsblk
+  ```
+* Exit root:
+  ```
+  $ exit
+  ```
 
 ## Mission 2: Create and Mount EFS Volume
 ### Step 1: Create an EFS Volume
