@@ -1,3 +1,10 @@
+# Introduction:
+This is a guide for implementing the following:
+1) Launch EC2 Instance, Create and Mount EBS Volume with UserData file.
+2) Create and Mount EFS Volume with AWS EFS Dashboard and EFS mount helper.
+ 
+<br/>
+
 # Explanation:
 ## EBS (Elastic Block Store):
 * An ***Amazon EBS Volume*** is a durable, block-level storage device that can be attached to ***Amazon EC2 instances***. <br/>
@@ -174,3 +181,5 @@
     ```
     $ df -h
     ```
+
+*Author*: [LuciaHeredia](https://github.com/LuciaHeredia)
