@@ -164,22 +164,40 @@
 
 ## Mission 2: Create and Mount EFS Volume
 ### Step 1: Create an EFS Volume
+* Creating Security Group for EFS:
+  - Go to EC2 dashboard, in left menu press "Network & Security", then "Security Groups".
+  - Set a "name" and "description".
+  - Select "VPC". (EFS and its Security group must be in the same VPC).
+  - In "inbound rules" section press "Add rule", and select the "Type" **NFS**, select "source" to **Anywhere**.
 * Navigate to the **AWS Management Console** and access the **EFS service**.
 * Create a new **EFS file system**, select "customize" and configure: name, throughput mode, performance mode, network access, including selecting VPC and defining security groups:
   - Set **EFS** "name".
   - Select "Throughput mode".
   - In "Additional settings" -> set "Performance mode".
-  - In "Network access" select VPC ID and security groups.
+  - In "Network access" select **VPC** and **security group** from before for all mount targets.
 ### Step 2: Mount EFS Volume on EC2 Instance
 * Install the EFS mount helper on the EC2 instance using the package manager:
   - Enter EC2 instance again with SSH Client as before.
   - Install the EFS mount helper(NFS Client):
     ```
-    $ 
+    $ sudo apt-get -y install nfs-common
     ```
 * Create a mount point on the EC2 instance for the EFS volume:
-  ```
-  $ mkdir efs 
-  ```
-* Mount the EFS volume to the specified mount point.
-* Access the DNS name of the EFS file system from the console for mounting on EC2 instances.
+  - Enter as root:
+    ```
+    $ sudo -i
+    ```
+  - Create mount point folder:
+    ```
+    $ mkdir <efs-mount-point>
+    ```
+* Mount the EFS volume to the specified mount point. Access the DNS name of the EFS file system from the console for mounting on EC2 instances:
+  - In the **EFS dashboard**, go to the **EFS** created, press "attach".
+  - Select "Mount via DNS" and use the NFS client, example:
+    ```
+    $ sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0000000000000.efs.<region>.amazonaws.com:/ <efs-mount-point>
+    ```
+  - Check mount:
+    ```
+    $ df -h
+    ```
